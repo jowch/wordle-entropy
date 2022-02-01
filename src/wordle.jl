@@ -1,13 +1,16 @@
+module Wordle
+
 using Dates
 using HTTP
+
+export LATEST_WORDLE_NUMBER, fetch_word_lists
 
 
 WORDLE_URL = "https://www.powerlanguage.co.uk/wordle/"
 WORDLE_START_DATE = Date(2021, 6, 19)
-LATEST_KNOWN_WORDLE_NUMBER = Dates.value(today() - WORDLE_START_DATE) - 1
+LATEST_WORDLE_NUMBER = Dates.value(today() - WORDLE_START_DATE) - 1
 
-
-function fetch_known_words()
+function fetch_word_lists()
     js_url = let
         html = HTTP.request(:GET, WORDLE_URL).body |> String
 
@@ -27,16 +30,19 @@ function fetch_known_words()
     # list must be longer than the number of wordles we've had. Second, the list
     # of words is not in alphabetical order. I happen to know that the first
     # five words are enough to tell if the word list is in alphabetical order.
-    target_list = filter(matches) do candidate_list
-        if length(candidate_list) > LATEST_KNOWN_WORDLE_NUMBER 
-            first_five = candidate_list[1:5]
-            sorted = all(sort(first_five) .== first_five)
+    target_lists = filter(matches) do candidate_list
+        length(candidate_list) > LATEST_WORDLE_NUMBER 
+    end
 
-            return !sorted
-        else
-            return false
-        end
-    end |> only
+    is_sorted = map(target_lists) do list
+        first_five = list[1:5]
+        all(sort(first_five) .== first_five)
+    end
 
-    target_list[1:LATEST_KNOWN_WORDLE_NUMBER]
+    valid_words = target_lists[findall(is_sorted) |> only]
+    known_words = target_lists[findall(.!(is_sorted)) |> only][1:LATEST_WORDLE_NUMBER]
+
+    known_words, valid_words
 end
+
+end # module
