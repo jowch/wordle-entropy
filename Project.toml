@@ -1,3 +1,4 @@
 [deps]
-HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+Wordle = "c88c3f80-0ab4-4432-9bb5-8d3b9443166e"
